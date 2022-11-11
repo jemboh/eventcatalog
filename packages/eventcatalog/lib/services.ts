@@ -8,6 +8,8 @@ import { MarkdownFile } from '../types/index';
 import { getAllEvents, getAllEventsThatHaveRelationshipWithService } from '@/lib/events';
 import { getAllServicesFromDomains } from '@/lib/domains';
 
+import { useConfig } from '@/hooks/EventCatalog';
+
 const buildService = (eventFrontMatter: any): Service => {
   const {
     name,
@@ -21,6 +23,11 @@ const buildService = (eventFrontMatter: any): Service => {
   } = eventFrontMatter;
   return { name, summary, domain, owners, repository, tags, externalLinks, badges };
 };
+
+const getServicesDirPath = (): String => {
+  const { servicesDirPath } = useConfig();
+  return servicesDirPath || 'services';
+}
 
 export const getServiceByPath = (serviceDirPath: string): Service => {
   const { data } = readMarkdownFile(path.join(serviceDirPath, 'index.md'));
@@ -42,7 +49,7 @@ export const getAllServicesFromPath = (serviceDir: string): Service[] => {
 
 export const getAllServices = (): Service[] => {
   const allServicesFromDomainFolders = getAllServicesFromDomains();
-  const servicesWithoutDomains = getAllServicesFromPath(path.join(process.env.PROJECT_DIR, 'services'));
+  const servicesWithoutDomains = getAllServicesFromPath(path.join(process.env.PROJECT_DIR, getServicesDirPath));
 
   const services = [...allServicesFromDomainFolders, ...servicesWithoutDomains];
   const sortedServices = services.sort((a, b) => a.name.localeCompare(b.name));
@@ -65,10 +72,10 @@ export const getServiceByName = async ({
   domain?: string;
 }): Promise<{ service: Service; markdown: MarkdownFile }> => {
   try {
-    let servicesDir = path.join(process.env.PROJECT_DIR, 'services');
+    let servicesDir = path.join(process.env.PROJECT_DIR, getServicesDirPath);
 
     if (domain) {
-      servicesDir = path.join(process.env.PROJECT_DIR, 'domains', domain, 'services');
+      servicesDir = path.join(process.env.PROJECT_DIR, 'domains', domain, getServicesDirPath);
     }
 
     const serviceDirectory = path.join(servicesDir, serviceName);

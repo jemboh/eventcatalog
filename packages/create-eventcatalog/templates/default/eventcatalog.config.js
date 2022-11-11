@@ -5,6 +5,7 @@ module.exports = {
   projectName: 'Event Catalog',
   editUrl: 'https://github.com/boyney123/eventcatalog-demo/edit/master',
   trailingSlash: true,
+  servicesDirPath: '.svc',
   primaryCTA: {
     label: 'Explore Events',
     href: '/events'
